@@ -30,7 +30,7 @@ class AVLNode(object):
 			self.left = AVLNode(None, None)
 			self.right = AVLNode(None, None)
 			self.height = 0
-		
+			self.size = 1
 
 	"""returns whether self is not a virtual node 
 
@@ -51,7 +51,7 @@ class AVLNode(object):
 
 	def successor(self): #only used if self has 2 children
 		current_node = self.right
-		while not current_node.left.is_real_node():
+		while current_node.left.is_real_node():
 			current_node = current_node.left
 		return current_node
 
@@ -80,7 +80,7 @@ class AVLTree(object):
 	"""
 	def search(self, key):
 		curr_node = self.root
-		while curr_node.key != None:
+		while curr_node.is_real_node():
 			if key == curr_node.key:
 				return curr_node
 			elif key < curr_node.key:
@@ -109,7 +109,7 @@ class AVLTree(object):
 		if not self.root.is_real_node():
 			self.root = node_to_add
 			self.root.parent = AVLNode(None, None)
-			return
+			return 0
 
 		while curr_node.is_real_node():
 			save_parent = curr_node
@@ -139,11 +139,14 @@ class AVLTree(object):
 			bf = save_parent.get_balance_factor()
 
 			if abs(bf) < 2 and save_parent.height == save_parent.return_updated_height():
-				continue
+				save_parent.update_size()
+				save_parent = save_parent.parent
 
 			elif abs(bf) < 2:
 				save_parent.height = save_parent.return_updated_height()
 				num_of_balances += 1
+				save_parent.update_size()
+				save_parent = save_parent.parent
 
 			else:
 				if bf == -2:
@@ -160,9 +163,8 @@ class AVLTree(object):
 					else:
 						self.right_rotation(save_parent)
 						num_of_balances += 1
-				
-			save_parent.update_size()
-			save_parent = save_parent.parent
+				save_parent = save_parent.parent
+
 
 		return num_of_balances
 
@@ -176,68 +178,102 @@ class AVLTree(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def delete(self, node):
+		num_of_balances = 0
+
 		#bst delete
-		if (node.right.key == None and node.left.key ==None):
+		if (not node.right.is_real_node() and not node.left.is_real_node()):
 			save_parent = node.parent
-			if (self.root ==node):
+			if (self.root == node):
 				self.root = AVLNode(None, None)
-			if (node.parent.key > node.key):
+			elif (node.parent.key > node.key):
 				node.parent.left = AVLNode(None, None)
-			node.parent.right = AVLNode(None, None)
-		if (node.right.key == None):
+			else:
+				node.parent.right = AVLNode(None, None)
+
+		elif (not node.right.is_real_node()):
 			save_parent = node.parent
-			if (self.root ==node):
+			if (self.root == node):
 				self.root = node.left
 				node.left.parent = AVLNode(None, None)
-			if (node.parent.key > node.key):
+			elif (node.parent.key > node.key):
 				node.parent.left = node.left
 				node.left.parent = node.parent
-			node.parent.right = node.left 
-			node.left.parent = node.parent 
-		if (node.left.key == None):
+			else:
+				node.parent.right = node.left
+				node.left.parent = node.parent
+
+		elif (not node.left.is_real_node()):
 			save_parent = node.parent
-			if (self.root ==node):
+			if (self.root == node):
 				self.root = node.right
 				node.right.parent = AVLNode(None, None)
-			if (node.parent.key > node.key):
+			elif (node.parent.key > node.key):
 				node.parent.left = node.right
 				node.right.parent = node.parent
-			node.parent.right = node.right 
-			node.right.parent = node.parent 
-		successor = successor(node)
-		save_parent = successor.parent
-		#remove successor
-		successor.parent.left = successor.right
-		if ( successor.right !=None):
-			successor.right.parent = successor.parent
+			else:
+				node.parent.right = node.right
+				node.right.parent = node.parent
 
-		#replace node with successor 
-		if (self.root == node):
-			self.root = successor
 		else:
-			if (node.parent.key > node.key):
-				node.parent.left = successor
-			node.parent.right = successor
-		successor.parent = node.parent		
-		successor.right = node.right
-		node.right.parent = successor
-		successor.left = node.left
-		node.left.parent = successor
+			successor = node.successor()
+			curr_node_height = node.height
+			if (successor.key > successor.parent.key): #if the successor is one step to the right
+				successor.parent = node.parent
+				successor.left = node.left
+				node.left.parent = successor
+				if (self.root == node):
+					self.root = successor
+				elif (node.key < node.parent.key):
+					node.parent.left = successor
+				else:
+					node.parent.right = successor
+				save_parent = successor
+			else:
+			#remove successor
+				save_parent = successor.parent
+				successor.parent.left = successor.right
+				if (successor.right.is_real_node()):
+					successor.right.parent = successor.parent
+
+
+
+				#replace node with successor
+				if (self.root == node):
+					self.root = successor
+				else:
+					if (node.parent.key > node.key):
+						node.parent.left = successor
+					else:
+						node.parent.right = successor
+				successor.parent = node.parent
+				successor.right = node.right
+				node.right.parent = successor
+				successor.left = node.left
+				node.left.parent = successor
+
+			if curr_node_height != successor.return_updated_height():
+				num_of_balances+=1
+
+			successor.height = node.height
+
 
 		#update information for avl and rotations
 		bf = 0
-		num_of_balances = 0
+
 
 		while  save_parent != None and save_parent.is_real_node(): #going up in the tree until it is balanced 
 
 			bf = save_parent.get_balance_factor()
 
 			if abs(bf) < 2 and save_parent.height == save_parent.return_updated_height():
-				continue
+				save_parent.update_size()
+				save_parent = save_parent.parent
 
 			elif abs(bf) < 2:
 				save_parent.height = save_parent.return_updated_height()
 				num_of_balances += 1
+				save_parent.update_size()
+				save_parent = save_parent.parent
 
 			else:
 				if bf == -2:
@@ -254,9 +290,9 @@ class AVLTree(object):
 					else:
 						self.right_rotation(save_parent)
 						num_of_balances += 1
+				save_parent = save_parent.parent
 				
-			save_parent.update_size()
-			save_parent = save_parent.parent
+
 
 		return num_of_balances
 
@@ -274,6 +310,13 @@ class AVLTree(object):
 
 		if (self.root == problem_node):
 			self.root = left_node
+
+		if (left_node.parent.is_real_node()):
+			if (left_node.key > left_node.parent.key):
+				left_node.parent.right=left_node
+			else:
+				left_node.parent.left = left_node
+
 
 		#update heights
 		left_node.right.height = left_node.right.return_updated_height()
@@ -297,6 +340,12 @@ class AVLTree(object):
 
 		if (self.root == problem_node):
 			self.root = right_node
+
+		if (right_node.parent.is_real_node()):
+			if (right_node.key > right_node.parent.key):
+				right_node.parent.right=right_node
+			else:
+				right_node.parent.left = right_node
 
 		#update heights
 		right_node.right.height = right_node.right.return_updated_height()
@@ -327,7 +376,13 @@ class AVLTree(object):
 
 		if (self.root == problem_node):
 			self.root = left_right_node
-		
+
+		if (left_right_node.parent.is_real_node()):
+			if (left_right_node.key > left_right_node.parent.key):
+				left_right_node.parent.right=left_right_node
+			else:
+				left_right_node.parent.left = left_right_node
+
 		#update heights
 		left_right_node.right.height = left_right_node.right.return_updated_height()
 		left_right_node.left.height = left_right_node.left.return_updated_height()
@@ -354,6 +409,12 @@ class AVLTree(object):
 
 		if (self.root == problem_node):
 			self.root = right_left_node
+
+		if (right_left_node.parent.is_real_node()):
+			if (right_left_node.key > right_left_node.parent.key):
+				right_left_node.parent.right=right_left_node
+			else:
+				right_left_node.parent.left = right_left_node
 
 		#update heights
 		right_left_node.right.height = right_left_node.right.return_updated_height()
@@ -462,7 +523,7 @@ class AVLTree(object):
 	"""
 	def max_range(self, a, b):
 		root = self.root
-		if (root == None):
+		if (root.key == None):
 			return None 
 		
 		if (root.key < a):
