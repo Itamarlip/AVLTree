@@ -1,12 +1,42 @@
 from AVLTree import AVLTree, AVLNode
-
+import  random
+"""
 T = AVLTree()
 
 for i in range(1,13):
     T.insert(i,str(i))
-
 T.delete(T.search(9))
 print(T.delete(T.search(11)))
+"""
+
+
+
+
+def create_tree(values, random_order=False):
+    if random_order:
+        random.shuffle(values)
+    tree = AVLTree()
+    for val in values:
+        print(val)
+        tree.insert(val, str(val))
+    return tree
+
+
+"""lst = [i for i in range(1,1000)]
+copy = []
+for i in range(1000):
+    copy.append((i, str(i)))
+random.shuffle(lst)
+print("here 12")
+
+T = create_tree(lst)
+
+print("here 1")
+
+print(lst == T.avl_to_array())"""
+
+
+
 
 def display(self):
     lines, *_ = display_aux(self)
@@ -60,4 +90,12 @@ def display_aux(self):
     return lines, n + m + u, max(p, q) + 2, n + u // 2
 
 
-display(T.get_root())
+tree = AVLTree()
+values = lst = [383,39,1187,751,557]
+for val in values:
+    tree.insert(val, str(val))
+    print(tree.rank(tree.search(val)))
+
+print("W")
+display(tree.get_root())
+print(tree.max_range(39,800).key)

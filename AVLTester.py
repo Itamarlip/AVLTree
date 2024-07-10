@@ -502,7 +502,7 @@ class AVLTreeTester2022(unittest.TestCase):
             self.assertEqual(self.tree.search(i).value, str(i))
         self.add_points(1)
 
-    """def test_search_complex(self):
+    def test_search_complex(self):
         N = 100
         T = self.create_tree([i for i in range(N)], random_order=True)
         in_order = self.in_order(T)
@@ -531,7 +531,7 @@ class AVLTreeTester2022(unittest.TestCase):
                     i
                 ),
             )
-        self.add_points(1.5)"""
+        self.add_points(1.5)
 
     def test_inserts_and_avl_node_functions(self):
         # Example from https://visualgo.net/en/bst?mode=AVL&create=41,20,65,11,29,50,91,31,72,99

@@ -1,8 +1,8 @@
 #username - complete info
 #id1      - 331777987
 #name1    - Itamar Lipkin
-#id2      - complete info
-#name2    - complete info  
+#id2      - Ben Heller
+#name2    - 328148366
 
 
 
@@ -397,15 +397,17 @@ class AVLTree(object):
 		right_node = problem_node.right
 		right_left_node = right_node.left
 
+
 		right_left_node.parent = problem_node.parent
 		problem_node.parent = right_left_node
 		problem_node.right = right_left_node.left
 		right_left_node.left.parent = problem_node
 		right_left_node.left = problem_node
 		right_node.parent = right_left_node
-		right_node.right = right_left_node.right
+		right_node.left = right_left_node.right
 		right_left_node.right.parent = right_node
 		right_left_node.right = right_node
+
 
 		if (self.root == problem_node):
 			self.root = right_left_node
@@ -476,14 +478,12 @@ class AVLTree(object):
 		left_size = node.left.size + 1
 		cuur_node = node
 
-		while (cuur_node != None and cuur_node != self.root):
+		while (cuur_node.is_real_node()):
 			if cuur_node == cuur_node.parent.right:
-				left_size = left_size + cuur_node.parent.right + 1
-				
+				left_size += cuur_node.parent.left.size + 1
 			cuur_node = cuur_node.parent
 
-		if node.key < self.root.key:
-			left_size += self.root.left.size + 1
+
 			
 		return left_size
 
