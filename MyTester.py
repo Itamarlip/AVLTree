@@ -98,4 +98,4 @@ for val in values:
 
 print("W")
 display(tree.get_root())
-print(tree.max_range(39,800).key)
+print(tree.max_range(111110,10010101).key)

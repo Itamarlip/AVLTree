@@ -118,7 +118,7 @@ class AVLTree(object):
             while curr_node.key != None and key < curr_node.key:
                 search_cost+=1
                 curr_node = curr_node.parent
-            search_cost+=1
+            search_cost-=1
             if (curr_node.key == None):
                 curr_node = self.root
             else:
@@ -153,7 +153,7 @@ class AVLTree(object):
             save_parent.left = node_to_add
         else:
             save_parent.right = node_to_add
-        search_cost += 1
+        #search_cost += 1
         bf = 0
         num_of_balances = 0
 

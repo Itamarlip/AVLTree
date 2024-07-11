@@ -1,8 +1,8 @@
-#username - complete info
+#username - itamarlipkin
 #id1      - 331777987
 #name1    - Itamar Lipkin
-#id2      - Ben Heller
-#name2    - 328148366
+#id2      - 328148366
+#name2    - Ben Heller
 
 
 
@@ -49,7 +49,10 @@ class AVLNode(object):
 	def update_size(self):
 		self.size = self.left.size + self.right.size + 1
 
-	def successor(self): #only used if self has 2 children
+
+	"""
+	@pre self has 2 children """
+	def successor(self):  #O(logn)
 		current_node = self.right
 		while current_node.left.is_real_node():
 			current_node = current_node.left
@@ -78,7 +81,7 @@ class AVLTree(object):
 	@rtype: AVLNode
 	@returns: node corresponding to key
 	"""
-	def search(self, key):
+	def search(self, key): # O(logn)
 		curr_node = self.root
 		while curr_node.is_real_node():
 			if key == curr_node.key:
@@ -100,16 +103,18 @@ class AVLTree(object):
 	@rtype: int
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
-	def insert(self, key, val):
-		#inserting to a BST as usual
+	def insert(self, key, val): #O(logn)
+
 		curr_node = self.root
 		save_parent = None
 		node_to_add = AVLNode(key,val)
 		
-		if not self.root.is_real_node():
+		if not self.root.is_real_node(): #special case of empty tree
 			self.root = node_to_add
 			self.root.parent = AVLNode(None, None)
 			return 0
+
+		# inserting to a BST as usual
 
 		while curr_node.is_real_node():
 			save_parent = curr_node
@@ -177,11 +182,11 @@ class AVLTree(object):
 	@rtype: int
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
-	def delete(self, node):
+	def delete(self, node): #O(logn)
 		num_of_balances = 0
 
 		#bst delete
-		if (not node.right.is_real_node() and not node.left.is_real_node()):
+		if (not node.right.is_real_node() and not node.left.is_real_node()): #case 1- node has no children
 			save_parent = node.parent
 			if (self.root == node):
 				self.root = AVLNode(None, None)
@@ -190,7 +195,7 @@ class AVLTree(object):
 			else:
 				node.parent.right = AVLNode(None, None)
 
-		elif (not node.right.is_real_node()):
+		elif (not node.right.is_real_node()): #case 2- node has left children
 			save_parent = node.parent
 			if (self.root == node):
 				self.root = node.left
@@ -202,7 +207,7 @@ class AVLTree(object):
 				node.parent.right = node.left
 				node.left.parent = node.parent
 
-		elif (not node.left.is_real_node()):
+		elif (not node.left.is_real_node()): #case 3- node has right children
 			save_parent = node.parent
 			if (self.root == node):
 				self.root = node.right
@@ -214,9 +219,10 @@ class AVLTree(object):
 				node.parent.right = node.right
 				node.right.parent = node.parent
 
-		else:
+		else:	#case 4- node has 2 children, call successor and switch bewtween them
 			successor = node.successor()
 			curr_node_height = node.height
+
 			if (successor.key > successor.parent.key): #if the successor is one step to the right
 				successor.parent = node.parent
 				successor.left = node.left
@@ -228,8 +234,9 @@ class AVLTree(object):
 				else:
 					node.parent.right = successor
 				save_parent = successor
-			else:
-			#remove successor
+
+			else: #remove successor
+
 				save_parent = successor.parent
 				successor.parent.left = successor.right
 				if (successor.right.is_real_node()):
@@ -251,7 +258,7 @@ class AVLTree(object):
 				successor.left = node.left
 				node.left.parent = successor
 
-			if curr_node_height != successor.return_updated_height():
+			if curr_node_height != successor.return_updated_height(): #checks if there is a need to do balance op. (change of height)
 				num_of_balances+=1
 
 			successor.height = node.height
@@ -301,6 +308,7 @@ class AVLTree(object):
 	
 	def right_rotation(self, problem_node):
 		#perform pointers change
+
 		left_node = problem_node.left
 		left_node.parent = problem_node.parent
 		problem_node.parent = left_node 
@@ -308,7 +316,7 @@ class AVLTree(object):
 		left_node.right.parent = problem_node
 		left_node.right = problem_node
 
-		if (self.root == problem_node):
+		if (self.root == problem_node): #special case of rotating from the root, updating the root
 			self.root = left_node
 
 		if (left_node.parent.is_real_node()):
@@ -338,7 +346,7 @@ class AVLTree(object):
 		right_node.left.parent = problem_node
 		right_node.left = problem_node
 
-		if (self.root == problem_node):
+		if (self.root == problem_node): #special case of rotating from the root, updating the root
 			self.root = right_node
 
 		if (right_node.parent.is_real_node()):
@@ -374,7 +382,7 @@ class AVLTree(object):
 		left_right_node.left.parent = left_node
 		left_right_node.left = left_node
 
-		if (self.root == problem_node):
+		if (self.root == problem_node): #special case of rotating from the root, updating the root
 			self.root = left_right_node
 
 		if (left_right_node.parent.is_real_node()):
@@ -394,9 +402,9 @@ class AVLTree(object):
 		left_right_node.update_size()
 
 	def right_left_rotation(self, problem_node):
+		# perform pointers change
 		right_node = problem_node.right
 		right_left_node = right_node.left
-
 
 		right_left_node.parent = problem_node.parent
 		problem_node.parent = right_left_node
@@ -408,8 +416,7 @@ class AVLTree(object):
 		right_left_node.right.parent = right_node
 		right_left_node.right = right_node
 
-
-		if (self.root == problem_node):
+		if (self.root == problem_node): #special case of rotating from the root, updating the root
 			self.root = right_left_node
 
 		if (right_left_node.parent.is_real_node()):
@@ -434,23 +441,24 @@ class AVLTree(object):
 	@returns: a sorted list according to key of touples (key, value) representing the data structure
 	"""
 
-	def avl_to_array(self):
+	def avl_to_array(self): #O(n)
 		root = self.root
 		if root.key == None:
 			return []
+
+		#calling the recursive function
 		list_ret = [(root.key, root.value)]
-		left_list = []
-		right_list = []
 		left_list = self.to_arr_rec(root.left)
 		right_list = self.to_arr_rec(root.right)
-		return left_list + list_ret + right_list 
+		return left_list + list_ret + right_list
 	
 	def to_arr_rec(self, node):
+
 		if node.value==None:
 			return []
 		list_ret = [(node.key, node.value)]
-		left_list = [] 
-		right_list = []
+
+		# calling the function recursivly with the left and right subtrees
 		left_list = self.to_arr_rec(node.left)
 		right_list = self.to_arr_rec(node.right)
 		return left_list + list_ret + right_list
@@ -463,7 +471,7 @@ class AVLTree(object):
 	@returns: the number of items in dictionary 
 	"""
 	def size(self):
-		return self.root.size	
+		return self.root.size #we keep the field updeted throught the run
 
 
 	"""compute the rank of node in the dictionary
@@ -474,17 +482,15 @@ class AVLTree(object):
 	@rtype: int
 	@returns: the rank of node in self
 	"""
-	def rank(self, node):
+	def rank(self, node): #O(logn)
 		left_size = node.left.size + 1
 		cuur_node = node
 
-		while (cuur_node.is_real_node()):
+		while (cuur_node.is_real_node()): #go up to the root and count sizes of left subtrees
 			if cuur_node == cuur_node.parent.right:
 				left_size += cuur_node.parent.left.size + 1
 			cuur_node = cuur_node.parent
 
-
-			
 		return left_size
 
 
@@ -503,12 +509,14 @@ class AVLTree(object):
 
 		if (left_size == i):
 			return node
+
+		#go right or left depending on if we passed the selected 'i'
 		if (left_size > i):
 			return self.rec_select(node.left,i)
 		
 		return self.rec_select(node.right,i-left_size)
 
-	def select(self, i):
+	def select(self, i): #O(logn)
 			return self.rec_select(self.root, i)
 
 	"""finds the node with the largest value in a specified range of keys
@@ -521,55 +529,55 @@ class AVLTree(object):
 	@rtype: AVLNode
 	@returns: the node with maximal (lexicographically) value having a<=key<=b, or None if no such keys exist
 	"""
-	def max_range(self, a, b):
+	def max_range(self, a, b): #O(n)
 		root = self.root
 		if (root.key == None):
 			return None 
-		
+		#special cases
 		if (root.key < a):
+			if (root.right.key == None):#checks if there are no keys greater than a
+				return None
 			return self.rec_max_range(root.right,a,b)
 		if (root.key > b):
+			if (root.left.key == None):#checks if there are no keys smaller than b
+				return None
 			return self.rec_max_range(root.left,a,b)
-		if (root.key == a):
+		if (root.key == a): #if key is exactly a then we don't go left
 			return self.max_lex(root,self.rec_max_range(root.right,a,b))
-		if (root.key == b):
+		if (root.key == b):#if key is exactly b then we don't go right
 			return self.max_lex(root,self.rec_max_range(root.left,a,b))
-		
+		#no special case, returns the max of both sons and itself
 		return self.max_lex(root,self.max_lex(self.rec_max_range(root.right,a,b),self.rec_max_range(root.left,a,b)))
 	
 	def rec_max_range(self,node,a,b):
 		if (node.value == None):
 			return node
-		
+		# special cases
 		if (node.key < a):
+			if (node.right.key == None):#checks if there are no keys greater than a
+				return None
 			return self.rec_max_range(node.right,a,b)
 		if (node.key > b):
+			if (node.left.key == None):#checks if there are no keys smaller than b
+				return None
 			return self.rec_max_range(node.left,a,b)
-		if (node.key == a):
+		if (node.key == a):#if key is exactly a then we don't go left
 			return self.max_lex(node,self.rec_max_range(node.right,a,b))
-		if (node.key == b):
+		if (node.key == b):#if key is exactly b then we don't go right
 			return self.max_lex(node,self.rec_max_range(node.left,a,b))
-		
+		# no special case, returns the max of both sons and itself
 		return self.max_lex(node,self.max_lex(self.rec_max_range(node.right,a,b),self.rec_max_range(node.left,a,b)))
 		
-	def max_lex(self, node1, node2):
+	def max_lex(self, node1, node2): #compares the values and returns the node of the "bigger" string
 		if (node1.value == None):
 			return node2
 		if (node2.value == None):
 			return node1
-		
-		char_list1 = [char for char in node1.value]
-		char_list2 = [char for char in node2.value]
 
-		for i in range(0,min(len(char_list1),len(char_list2))):
-			if (char_list1[i]>char_list2[i]):
-				return node1
-			if (char_list1[i]<char_list2[i]):
-				return node2
-		
-		if (len(char_list1)>len(char_list2)):
+		if (node1.value > node2.value):
 			return node1
 		return node2
+
 	
 	"""returns the root of the tree representing the dictionary
 
@@ -577,5 +585,9 @@ class AVLTree(object):
 	@returns: the root, None if the dictionary is empty
 	"""
 	def get_root(self):
+
+		if (not self.root.is_real_node()): #we keep the root of empty tree as virtual
+			return None
+
 		return self.root
 

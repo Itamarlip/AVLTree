@@ -10,8 +10,9 @@ for i in range(1,6):
     curr_hilufim = 0
 
     lst = [k for k in range(1,n+1)]
-    random.shuffle(lst)
+    #random.shuffle(lst)
     #print(lst)
+    lst = lst[::-1]
     for j in range(n):
         t = curr_tree.insert(lst[j], str(lst[j]))
         curr_cost += t[0]
